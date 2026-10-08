@@ -1,0 +1,3 @@
+Public source edition
+
+Real machine/account/group identifiers have been replaced with examples. Old private Git history and runtime data are not included. Native v6 artifacts are rebuilt from the sanitized sources. This edition requires new local account enrollment and locally configured actual conversation IDs before use. The already prepared mini-PC retains its original local deployment snapshot; do not overwrite its .local state with examples. Native quote sending remains unfinished.

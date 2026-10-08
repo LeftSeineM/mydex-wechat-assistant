@@ -1,0 +1,44 @@
+// Experimental wire-shape reconstruction from the installed Weixin.dll.
+// SHA256: 10f8e995453e2da46d4f2b5080cd6da1f13cc5147746adc119ceae38cb039de5
+// No client code is executed. Not an official protocol or a login implementation.
+// Field numbers and nesting are supported by parser/serializer disassembly.
+// Original field names, requiredness and defaults are not fully recovered.
+// Singular fields use optional for research; this does NOT reproduce IsInitialized.
+// No real response has yet been decoded with this schema.
+syntax = "proto2";
+package wechat_lab_recovered;
+
+// Type-name literal: micromsg.NewSyncResponse; vtable RVA 0x8fc0d48.
+// Parser RVA 0x106fb10; serializer RVA 0x10700b0.
+message NewSyncResponse {
+  optional int32 field_1 = 1;                 // native +0x10
+  optional CmdList field_2 = 2;               // native pointer +0x08
+  optional uint32 field_3 = 3;                // native +0x14
+  optional SKBuiltinBuffer_t field_4 = 4;     // native pointer +0x18
+  optional uint32 field_5 = 5;                // native +0x20
+  optional uint32 field_6 = 6;                // native +0x24
+  optional uint32 field_7 = 7;                // native +0x28
+}
+
+// Type-name literal: micromsg.CmdList; vtable RVA 0x93d3cf8.
+// Parser RVA 0x2e7d0e0; serializer RVA 0xf016a0.
+message CmdList {
+  optional uint32 field_1 = 1;                // native +0x20
+  repeated CmdItem field_2 = 2;               // native repeated container +0x08
+}
+
+// Type name is verified by the vtable's GetTypeName slot.
+// Vtable RVA 0x93d3c78; serializer RVA 0x2e7cd40.
+// Command IDs have NOT been mapped to chat-message semantics.
+message CmdItem {
+  optional int32 field_1 = 1;                 // native +0x10
+  optional SKBuiltinBuffer_t field_2 = 2;     // native pointer +0x08
+}
+
+// Type-name literal: micromsg.SKBuiltinBuffer_t; vtable RVA 0x8e3d058.
+// Parser RVA 0x67ab70; serializer RVA 0x67ad00.
+// Content meaning depends on the caller; never log arbitrary buffer contents.
+message SKBuiltinBuffer_t {
+  optional uint32 field_1 = 1;                // native +0x10
+  optional bytes field_2 = 2;                 // native string pointer +0x08
+}

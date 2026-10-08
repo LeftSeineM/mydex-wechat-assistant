@@ -1,0 +1,9 @@
+Two-computer workflow
+
+1. Clone the public repository; use each operator's own GitHub identity for writes. Do not copy a GitHub access token between machines.
+2. Read HANDOFF.txt and inspect git status before work. Pull --ff-only only with a clean worktree.
+3. Commit and push code/docs after changes; the other machine pulls those commits. Keep machine-specific settings and secrets under app/.local (ignored).
+4. Use feature branches when both machines edit concurrently. Do not force-push or overwrite uncommitted work.
+5. Do not start both assistants for the same WeChat account. During migration the old laptop remains the sole live host.
+6. On a new machine, login and enroll again; a Git clone is not a working WeChat session.
+7. Update HANDOFF.txt with verified behavior and remaining gaps. Never commit raw message logs or credential files as evidence.

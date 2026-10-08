@@ -1,0 +1,127 @@
+Mydex Windows migration handoff — 2026-10-08
+
+STATUS
+This is a source/binary handoff, not an already activated installation.
+The original laptop remains the live host. Do not run both hosts against the
+same account. Cut over only after the new host passes receive/model/send checks.
+
+TARGET STATUS
+The owner has a Windows 11 x64 mini-PC, Intel i7-13620H, about 32 GB RAM.
+SSH identity was verified. Deployment snapshot was copied under D:\Software\Mydex.
+The installed WeChat DLL exactly matches the supported hash below; not logged in
+at the preparation check. A separate D-drive Python 3.12.7 environment was created.
+Initial dependency install hit psutil 5.9.0's missing Windows/Python 3.12 wheel;
+requirements select psutil 5.9.8 and binary wheels only. All dependencies were
+installed on the target. Both lief.pyd and libLIEF.dll are needed and now included.
+The target passed 35 unit tests and the isolated native fixture. Credentials remain local.
+Existing other services on the mini-PC must remain untouched.
+
+LAYOUT
+app/: current Python sources and tests. account_assistant.py is the live entry.
+native/worker-sender-v6/: DLL, isolated fixture and SHA256 build manifest.
+vendor/minhook/: dependency source and license.
+vendor/python312-win-amd64/lief.pyd: exact extension used by the current host.
+deployment/: preparation/preflight scripts, configuration template and this file.
+MANIFEST.json: SHA256 hashes of all bundle files except itself.
+
+SOFTWARE AND COMPATIBILITY
+Install software under D:\Software. Prefer D:\Software\Mydex for the app and
+D:\Software\WeChatGroupLab\venv for Python. Use Windows x64 / CPython 3.12 x64.
+The Python environment/interpreter is NOT bundled. The LIEF extension is from
+the existing working Python 3.12 environment; verify it imports on the target.
+Use prepare.ps1 only after Python 3.12 x64 is available under D:\Software.
+It installs the pinned Python dependencies into a fresh D-drive venv and copies
+the packaged native artifacts to the paths expected by the current sender.
+
+The native adapter supports ONLY Weixin 4.1.15.13 with Weixin.dll SHA256:
+10f8e995453e2da46d4f2b5080cd6da1f13cc5147746adc119ceae38cb039de5
+Current expected DLL path:
+C:\Program Files\Tencent\Weixin\4.1.15.13\Weixin.dll
+Do not install software on C without the user's explicit exception. If the
+target uses another install path, adapt CLIENT in app/probe_native.py after
+verifying its actual version/hash and executable path; retain hash checks.
+Do not run the adapter against a different WeChat build or copy a live PID.
+The packaged build.py records the old compiler path; change it to a verified
+D-drive compiler before rebuilding. Prebuilt artifacts do not need a compiler.
+
+MODEL
+Paratera OpenAI-compatible chat completions:
+https://llmapi.paratera.com/v1 — exact model ID Qwen3.8-Flash.
+enable_thinking=false. Requests deliberately bypass inherited system proxies.
+Shared model concurrency is 4; each conversation has a durable FIFO of 100.
+Different conversations can run concurrently. Native sends are serialized.
+No active web-search tools or automatic image/voice/file-content decoding.
+Do not claim the gateway's advertised maximum is guaranteed usable concurrency.
+
+REQUIRED TARGET ONBOARDING (NOT AUTOMATED BY THIS BUNDLE)
+1. Log into the intended WeChat account in the target's interactive desktop.
+2. Inventory actual account DB paths and process identity locally. Bind fresh
+   session.json, history-file-profile.json and authorized reply-scope.json under
+   app/.local/quote-m-session. Never reuse the laptop's PID/create time/paths.
+3. Re-establish local database authentication and encrypt key material with the
+   target user's DPAPI. Never display/upload database or login keys.
+4. SessionHistory currently validates a real, authenticated self-message in
+   the work-base group. It still uses the old marker '引用原文1008'. On the target,
+   verify whether that message is synced, or deliberately adapt the enrollment
+   validation to a new real self-message. Do not fabricate sample evidence.
+   prepare_quote_account.py and deploy_*.py are old session-specific scripts;
+   do NOT execute them unchanged as generic installers.
+5. Save the model API key locally using deployment/configure_api.py. The key is
+   hidden during entry and encrypted with CurrentUser DPAPI. Existing laptop
+   DPAPI files cannot simply be copied to another Windows account/machine.
+6. Run the isolated sender fixture and verify build/source hashes on the target:
+   python app/research/worker_sender_v6/run.py --fixture
+   It creates app/.local/account-sender-fixture.json, not a live delivery proof.
+7. Bind sender v6 to the verified target process and its own send worker. Never
+   invent/adopt a thread ID from another process/machine. Verify one controlled
+   send from the work-base group by its real outgoing server record.
+8. Configure native-sender-settings.json with version 6 and valid local proof;
+   use the current group IDs only after authenticating membership/message tables.
+9. Start account_assistant.py in the SAME Windows user/interactive session as
+   WeChat. Run deployment/preflight.py before launch. Keep the task non-public;
+   no public HTTP endpoint is required for normal assistant operation.
+10. Verify another member's @, a DM, deduplication and a restart without replay.
+    Then stop the old assistant gracefully after its in-flight queue drains and
+    make the target authoritative. An unknown send must never be auto-retried.
+
+CURRENT AUTHORIZED BEHAVIOR
+All groups: respond to genuine member-selection @ of the logged-in account.
+Personal DMs: respond to new incoming messages. Ignore system/subscription peers.
+No automatic unmentioned group chatter. Ignore own messages except #Mydex tests.
+Context is isolated by conversation. Old messages may supply context but are
+not automatically replayed as requests. History means locally synced records,
+not a claim of complete server history.
+Explicitly enrolled groups: work-base, 示例讨论群, 示例学习群,
+示例朋友群. The last group was enrolled and its '早上好' @ was replied to;
+real outgoing server record verified on the source laptop.
+
+24-HOUR OPERATION
+Use logon startup in the interactive WeChat user's session, not a session-0
+Windows service. Schedule only AFTER successful fresh target enrollment.
+Allow model/network transient retry but preserve uncertain-send stops.
+If WeChat restarts, logs out, changes accounts or updates, pause and revalidate
+the session/version rather than looping injection or guessing new offsets.
+The current code does not automatically rebind a new client process. This is
+an outstanding migration task, not a solved unattended reboot feature.
+Configure AC sleep/restart recovery after checking the target's current policy.
+24-hour availability still depends on login, network, power and client stability.
+
+KNOWN LIMITATIONS / NEXT WORK
+Real plain-text group replies are verified. DM route is deployed and fixture
+tested but a real new DM send has not yet been verified.
+Reading native quotes works; SENDING native quoted replies is NOT implemented.
+Static leads: ChatInputView SetReferMessage 0x1bfda80; Send 0x1bf9810;
+ReferSendData copy constructor 0x768da0; model setter 0x3d98390, storage 0x508.
+Keep this research separate from the active plain-text path.
+The latest registry.copy() iteration fix is in source and takes effect on the
+next deliberate runtime restart. The live laptop has not been restarted for it.
+
+EXCLUDED
+No .local contents, chat database, API key, DPAPI blob, login state, SSH identity,
+raw captures or old delivery proof is shipped. Do not copy them wholesale.
+No WeChat binary or Python distribution is included.
+
+PUBLIC EDITION: real identifiers were replaced with examples. Native artifacts
+were rebuilt from these sources and passed the isolated fixture. Do not treat
+example account or group IDs as enrollment evidence. This public repository
+starts with clean Git history; the original deployment snapshot stays private.

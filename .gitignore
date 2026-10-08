@@ -1,0 +1,14 @@
+**/.local/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.env.*
+*.dpapi
+*.db
+*.db-*
+*.sqlite*
+*.log
+*.zip
+*credentials*
+!app/api_credentials.py

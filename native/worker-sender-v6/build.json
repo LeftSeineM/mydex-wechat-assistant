@@ -1,0 +1,12 @@
+{
+  "artifacts": {
+    "wx-send-fixture.exe": "de547aa97cca31bf49773bd314413a43fb1b0f623b0605250dad1f19fd8b21b0",
+    "wx-worker-sender-v6.dll": "8f0283341fac283862baa5180c89abd4be5cfde429833b1ad5e97172ab797001"
+  },
+  "sources": {
+    "native_sender.c": "e91043c126dde767531964aee1b95ea2a5ce0a3b3a8622306f1bc2b1aebcf43a",
+    "native_sender.h": "7f146a6af1072767c36446a750ac1f98614a9ae9f73301a4ac49e39b746fbf03",
+    "send_fixture.c": "6c85bae5cd2637918a3776c62befb9e30e165928865fd0aeb60bf0cd0bb593c2"
+  },
+  "client_delivery_verified": false
+}
